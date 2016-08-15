@@ -15,10 +15,10 @@ def token(request):
     l = sorted([timestamp,nonce,taken])
     tmpstr = "".join(l)
 
-    sha1 = hashlib.sha1()
-    tmpstr = sha1.update(tmpstr).hexdigest()
+    tmpstr = hashlib.sha1(tmpstr).hexdigest()
+    
     # 验证成功返回echostr
-    if(signature == tmpstr):
+    if signature == tmpstr:
         response = request.GET.get('echostr')
 
     return HttpResponse(response)
