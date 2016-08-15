@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # }
 
 if "SERVER_SOFTWARE" in os.environ:
-    DEBUG = False
+    DEBUG = True
     # from bae.core import const
     DATABASES={
         'default':{
