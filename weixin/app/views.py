@@ -5,6 +5,43 @@ import xml.etree.cElementTree as ET
 import time
 
 # Create your views here.
+
+def responseMsg(request):
+    tree = request.body
+    root = ET.fromstring(tree)
+
+    # '''
+    # <xml>
+    # <ToUserName><![CDATA[toUser]]></ToUserName>
+    # <FromUserName><![CDATA[FromUser]]></FromUserName>
+    # <CreateTime>123456789</CreateTime>
+    # <MsgType><![CDATA[event]]></MsgType>
+    # <Event><![CDATA[subscribe]]></Event>
+    # </xml>
+    # '''
+
+    if root.find('MsgType').text.lower() == "event":
+        if root.find('Event').text.lower() == 'subscribe':
+            toUser = root.find("FromUserName").text
+            fromUser = root.find('ToUserName').text
+            creatTime = int(time.time())
+            msgType = 'text'
+            content = "欢迎订阅"
+            template = """<xml>
+
+            <ToUserName><![CDATA[%s]]></ToUserName>
+
+            <FromUserName><![CDATA[%s]]></FromUserName>
+
+            <CreateTime>%s</CreateTime>
+
+            <MsgType><![CDATA[%s]]></MsgType>
+
+            <Content><![CDATA[%s]]></Content>
+
+            </xml>"""%(toUser,fromUser,creatTime,msgType,content)
+            return template
+            
 def index(request):
     # 与微信验证
     # 将timestamp，noce，token按字典排序
@@ -40,41 +77,7 @@ def index(request):
 
     
 
-def responseMsg(request):
-    tree = request.body
-    root = ET.fromstring(tree)
 
-    # '''
-    # <xml>
-    # <ToUserName><![CDATA[toUser]]></ToUserName>
-    # <FromUserName><![CDATA[FromUser]]></FromUserName>
-    # <CreateTime>123456789</CreateTime>
-    # <MsgType><![CDATA[event]]></MsgType>
-    # <Event><![CDATA[subscribe]]></Event>
-    # </xml>
-    # '''
-
-    if root.find('MsgType').text.lower() == "event":
-        if root.find('Event').text.lower() == 'subscribe':
-            toUser = root.find("FromUserName").text
-            fromUser = root.find('ToUserName').text
-            creatTime = int(time.time())
-            msgType = 'text'
-            content = "欢迎订阅"
-            template = """<xml>
-
-            <ToUserName><![CDATA[%s]]></ToUserName>
-
-            <FromUserName><![CDATA[%s]]></FromUserName>
-
-            <CreateTime>%s</CreateTime>
-
-            <MsgType><![CDATA[text]]></MsgType>
-
-            <Content><![CDATA[%s]]></Content>
-
-            </xml>"""%(toUser,fromUser,creatTime,content)
-            return template
 
 
 
