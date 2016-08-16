@@ -33,7 +33,7 @@ def index(request):
             return HttpResponse(echostr)
 
     if request.method == "POST":
-        xmlstr = vresponseMsg(request)
+        xmlstr = responseMsg(request)
         return HttpResponse(xmlstr,content_type="application/xml")    
 
         
