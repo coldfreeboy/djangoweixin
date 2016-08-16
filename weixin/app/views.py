@@ -41,7 +41,7 @@ def responseMsg(request):
 
             </xml>"""%(toUser,fromUser,creatTime,msgType,content)
             return template
-            
+
 def index(request):
     # 与微信验证
     # 将timestamp，noce，token按字典排序
@@ -68,6 +68,8 @@ def index(request):
 
         if signature == tmpstr and echostr:
             return HttpResponse(echostr)
+        if echostr:
+            return HttpResponse("")
 
     if request.method == "POST":
         xmlstr = responseMsg(request)
