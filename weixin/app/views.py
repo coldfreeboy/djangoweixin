@@ -3,8 +3,10 @@ from django.shortcuts import render,HttpResponse
 import hashlib
 import xml.etree.cElementTree as ET
 import time
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
+
 
 def responseMsg(request):
     tree = request.body
@@ -42,6 +44,8 @@ def responseMsg(request):
             </xml>"""%(toUser,fromUser,creatTime,msgType,content)
             return template
 
+
+@csrf_exempt
 def index(request):
     # 与微信验证
     # 将timestamp，noce，token按字典排序
