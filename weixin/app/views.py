@@ -42,7 +42,7 @@ def index(request):
 
 def responseMsg(request):
     tree = request.body
-    root = ET.fromstring(country_string)
+    root = ET.fromstring(tree)
 
     # '''
     # <xml>
