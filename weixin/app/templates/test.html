@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+<body>
+
+<input type="button" value="提交" id="bt_xml">
+
+<script>
+
+if (window.XMLHttpRequest)
+  {// code for IE7, Firefox, Opera, etc.
+  xmlHttp=new XMLHttpRequest();
+  }
+else if (window.ActiveXObject)
+  {// code for IE6, IE5
+  xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+
+var data = "<xml>\
+<ToUserName><![CDATA[dang]]></ToUserName>\
+<FromUserName><![CDATA[fromdang]]></FromUserName>\
+<CreateTime>123456789</CreateTime>\
+<MsgType><![CDATA[event]]></MsgType>\
+<Event><![CDATA[subscribe]]></Event>\
+</xml>"
+
+
+
+$('#bt_xml').click(function(){
+    xmlHttp.onreadystatechange=state_Change;
+    xmlHttp.open("POST", '/app/index/', true);
+    xmlHttp.setRequestHeader("Content-Type", "text/xml");
+    xmlHttp.send(data);
+})
+
+function state_Change(){
+   if(xmlHttp.readyState==4){
+            
+            if(xmlHttp.status==200){   
+        //纯文本数据的接受方法   
+                var message=xmlHttp.responseText; 
+                alert(message)
+            }
+    }
+}
+
+
+    
+</script>
+    
+</body>
+</html>
