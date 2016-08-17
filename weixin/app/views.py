@@ -31,20 +31,14 @@ def responseMsg(request):
             creatTime = str(int(time.time()))
             msgType = 'text'
             content = "欢迎订阅"
-            template = """<xml>
-
-            <ToUserName><![CDATA[%s]]></ToUserName>
-
-            <FromUserName><![CDATA[%s]]></FromUserName>
-
-            <CreateTime>%s</CreateTime>
-
-            <MsgType><![CDATA[%s]]></MsgType>
-
-            <Content><![CDATA[%s]]></Content>
-
-            </xml>"""%(toUser,fromUser,creatTime,msgType,content)
-            return template
+            template = "<xml>"+\
+            "<ToUserName><![CDATA[%s]]></ToUserName>"+\
+            "<FromUserName><![CDATA[%s]]></FromUserName>"+\
+            "<CreateTime>%s</CreateTime>"+\
+            "<MsgType><![CDATA[%s]]></MsgType>"+\
+            "<Content><![CDATA[%s]]></Content>"+\
+            "</xml>"
+            return template%(toUser,fromUser,creatTime,msgType,content)
 
 
 @csrf_exempt
