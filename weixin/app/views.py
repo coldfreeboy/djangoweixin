@@ -26,7 +26,7 @@ def responseMsg(request):
         if root.find('Event').text.lower() == 'subscribe':
             toUser = root.find("FromUserName").text
             fromUser = root.find('ToUserName').text
-            creatTime = int(time.time())
+            creatTime = str(int(time.time()))
             msgType = 'text'
             content = "欢迎订阅"
             template = """<xml>
