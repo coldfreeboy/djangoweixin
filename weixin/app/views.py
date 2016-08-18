@@ -20,6 +20,47 @@ def xmlText(toUser,fromUser,creatTime,msgType,content):
     </xml>"""%(toUser,fromUser,creatTime,msgType,content)
     return HttpResponse(template,content_type="application/xml")
 
+def xmlNews(toUser,fromUser,creatTime):
+
+    news_list = []
+    obj_news={
+    "title":"百度",
+    'description':"百度链接",
+    'picurl':"https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/logo_white_fe6da1ec.png",
+    'url':'http://www.baidu.com'
+    }
+    obj_news2={
+    "title":"百度",
+    'description':"百度链接",
+    'picurl':"https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/logo_white_fe6da1ec.png",
+    'url':'http://www.baidu.com'
+    }
+
+    news_list.append(obj_news)
+    news_list.append(obj_news2)
+    templates="<Articles>"
+ 
+    for i in news_list:
+
+        template ="""<item><Title><![CDATA[%s]]></Title> 
+        <Description><![CDATA[%s]]></Description>
+        <PicUrl><![CDATA[%s]]></PicUrl>
+        <Url><![CDATA[%s]]></Url></item>""" % (i['title'],i['description'],i['picurl'],i['url'])
+
+        templates = "%s%s" % (templates,template)
+
+    templates = "%s</Articles>" % templates
+    template_head ="""<xml>
+<ToUserName><![CDATA[%s]]></ToUserName>
+<FromUserName><![CDATA[%s]]></FromUserName>
+<CreateTime>%s</CreateTime>
+<MsgType><![CDATA[news]]></MsgType>
+<ArticleCount>%s</ArticleCount>""" % (toUser,fromUser,creatTime,len(news_list))
+    template_body ="%s%s</xml>"%(template_head,templates)
+
+    return HttpResponse(template_body,content_type="application/xml")
+
+
 
 # 关注响应时间
 def responseMsg(root):
@@ -36,30 +77,30 @@ def responseMsg(root):
 # 文本回复
 def responseText(root):
 
-    context = root.find('Content').text
-
-    if context.find("介绍".decode('utf-8')) != -1 :
-        content = "全栈开发，bae部署，经济实惠。"
-    elif context == "1":
-        content = "<a href='https://www.taobao.com/'>淘宝</a> "
-    else:
-        content="""
-        <p style="color:red">说明页</p>
-        <p>----------</p>
-        <p>1:淘宝链接</p>
-        其他返回说明页
-
-        """
-
-
     toUser = root.find("FromUserName").text
     fromUser = root.find('ToUserName').text
     creatTime = str(int(time.time()))
     msgType = 'text'
 
+    context = root.find('Content').text
+
+    if context.find("介绍".decode('utf-8')) != -1 :
+        content = "全栈开发，bae部署，经济实惠。"
+        
+    elif context == "1":
+        content = "<a href='https://www.taobao.com/'>淘宝</a> "
+        
+    elif context == "2":
+        return xmlNews(toUser,fromUser,creatTime)
+    else:
+        content="""
+        说明页
+        ----------
+        1:淘宝链接
+        其他返回说明页
+
+        """
     return xmlText(toUser,fromUser,creatTime,msgType,content)
-
-
 
 
 
