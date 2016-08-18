@@ -96,8 +96,13 @@ def responseText(root):
         content="""
         说明页
         ----------
-        1:淘宝链接
-        其他返回说明页
+        0:介绍测试 
+        1:淘宝链接测试
+        2:图片文章测试
+
+        第0项输入介绍
+        其余项输入对应数字
+        其他输入返回本页
 
         """
     return xmlText(toUser,fromUser,creatTime,msgType,content)
