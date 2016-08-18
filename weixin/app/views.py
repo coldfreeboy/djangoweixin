@@ -40,6 +40,17 @@ def responseText(root):
 
     if context.find("介绍".decode('utf-8')) != -1 :
         content = "全栈开发，bae部署，经济实惠。"
+    elif context == 1:
+        content = "<a href='https://www.taobao.com/'>淘宝</a> "
+    else:
+        content="""
+        <p style="color:red">说明页</p>
+        <p>----------</p>
+        <p>1:淘宝链接</p>
+        其他返回说明页
+
+        """
+
 
     toUser = root.find("FromUserName").text
     fromUser = root.find('ToUserName').text
