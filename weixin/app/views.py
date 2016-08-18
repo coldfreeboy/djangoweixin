@@ -36,9 +36,10 @@ def responseMsg(root):
 # 文本回复
 def responseText(root):
 
-    context = root.find('Content').text.lower()
+    context = root.find('Content').text
 
-    if context.find("介绍"):
+    print(context)
+    if context.find("介绍".decode('utf-8')) != -1 :
         content = "全栈开发，bae部署，经济实惠。"
 
     toUser = root.find("FromUserName").text

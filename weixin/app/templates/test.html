@@ -28,13 +28,22 @@ var data = "<xml>\
 <Event><![CDATA[subscribe]]></Event>\
 </xml>"
 
+var textdata ="<xml>\
+<ToUserName><![CDATA[dang]]></ToUserName>\
+<FromUserName><![CDATA[fromdang]]></FromUserName>\
+<CreateTime>123456789</CreateTime>\
+<Content><![CDATA[介绍]]></Content>\
+<MsgType><![CDATA[text]]></MsgType>\
+<MsgId>1234567890123456</MsgId>\
+</xml>"
+
 
 
 $('#bt_xml').click(function(){
     xmlHttp.onreadystatechange=state_Change;
     xmlHttp.open("POST", '/app/index/', true);
     xmlHttp.setRequestHeader("Content-Type", "text/xml");
-    xmlHttp.send(data);
+    xmlHttp.send(textdata);
 })
 
 function state_Change(){
