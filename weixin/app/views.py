@@ -38,7 +38,6 @@ def responseText(root):
 
     context = root.find('Content').text
 
-    print(context)
     if context.find("介绍".decode('utf-8')) != -1 :
         content = "全栈开发，bae部署，经济实惠。"
 
