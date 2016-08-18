@@ -10,18 +10,7 @@ def home(request):
     return render(request,"test.html")
 
 
-# 关注响应时间
-def responseMsg(root):
-
-
-    
-    toUser = root.find("FromUserName").text
-    fromUser = root.find('ToUserName').text
-    creatTime = str(int(time.time()))
-    msgType = 'text'
-    content = "欢迎订阅"
-
-
+def xmlText(toUser,fromUser,creatTime,msgType,content):
     template = """<xml>
     <ToUserName><![CDATA[%s]]></ToUserName>
     <FromUserName><![CDATA[%s]]></FromUserName>
@@ -29,8 +18,38 @@ def responseMsg(root):
     <MsgType><![CDATA[%s]]></MsgType>
     <Content><![CDATA[%s]]></Content>
     </xml>"""%(toUser,fromUser,creatTime,msgType,content)
+    return HttpResponse(template,content_type="application/xml")
 
-    return HttpResponse(template,content_type="application/xml") 
+
+# 关注响应时间
+def responseMsg(root):
+
+    toUser = root.find("FromUserName").text
+    fromUser = root.find('ToUserName').text
+    creatTime = str(int(time.time()))
+    msgType = 'text'
+    content = "欢迎订阅"
+
+    return xmlText(toUser,fromUser,creatTime,msgType,content)
+
+
+# 文本回复
+def responseText(root):
+
+    context = root.find('Content').text.lower()
+
+    if context.find("介绍"):
+        content = "全栈开发，bae部署，经济实惠。"
+
+    toUser = root.find("FromUserName").text
+    fromUser = root.find('ToUserName').text
+    creatTime = str(int(time.time()))
+    msgType = 'text'
+
+    return xmlText(toUser,fromUser,creatTime,msgType,content)
+
+
+
 
 
 @csrf_exempt
@@ -67,10 +86,15 @@ def index(request):
 
         #事件
         if root.find('MsgType').text.lower() == "event":
-            # 关注时间
+            # 关注事件
             if root.find('Event').text.lower() == 'subscribe':
                 return responseMsg(root)
            
+
+        # 文本
+        if root.find('MsgType').text.lower() == "text":
+            return responseText(root)
+
 
         
 
