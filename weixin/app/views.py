@@ -79,7 +79,7 @@ def index(request):
     if request.method == "POST":
 
         tree = request.body
-        if not tree:
+        if tree:
             root = ET.fromstring(tree)
         else:
             return HttpResponse('xml不能解析')
