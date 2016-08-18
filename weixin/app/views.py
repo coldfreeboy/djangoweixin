@@ -10,45 +10,27 @@ def home(request):
     return render(request,"test.html")
 
 
-def responseMsg(request):
-    tree = request.body
-    root = ET.fromstring(tree)
+# 关注响应时间
+def responseMsg(root):
 
-    # '''
-    # <xml>
-    # <ToUserName><![CDATA[toUser]]></ToUserName>
-    # <FromUserName><![CDATA[FromUser]]></FromUserName>
-    # <CreateTime>123456789</CreateTime>
-    # <MsgType><![CDATA[event]]></MsgType>
-    # <Event><![CDATA[subscribe]]></Event>
-    # </xml>
-    # '''
 
-    if root.find('MsgType').text.lower() == "event":
-        if root.find('Event').text.lower() == 'subscribe':
-            toUser = root.find("FromUserName").text
-            fromUser = root.find('ToUserName').text
-            creatTime = str(int(time.time()))
-            msgType = 'text'
-            content = "欢迎订阅"
+    
+    toUser = root.find("FromUserName").text
+    fromUser = root.find('ToUserName').text
+    creatTime = str(int(time.time()))
+    msgType = 'text'
+    content = "欢迎订阅"
 
-            # template = "<xml>"+\
-            # "<ToUserName><![CDATA[%s]]></ToUserName>"+\
-            # "<FromUserName><![CDATA[%s]]></FromUserName>"+\
-            # "<CreateTime>%s</CreateTime>"+\
-            # "<MsgType><![CDATA[%s]]></MsgType>"+\
-            # "<Content><![CDATA[%s]]></Content>"+\
-            # "</xml>"
-            # return template%(toUser,fromUser,creatTime,msgType,content)
 
-            template = """<xml>
-            <ToUserName><![CDATA[%s]]></ToUserName>
-            <FromUserName><![CDATA[%s]]></FromUserName>
-            <CreateTime>%s</CreateTime>
-            <MsgType><![CDATA[%s]]></MsgType>
-            <Content><![CDATA[%s]]></Content>
-            </xml>"""%(toUser,fromUser,creatTime,msgType,content)
-            return template
+    template = """<xml>
+    <ToUserName><![CDATA[%s]]></ToUserName>
+    <FromUserName><![CDATA[%s]]></FromUserName>
+    <CreateTime>%s</CreateTime>
+    <MsgType><![CDATA[%s]]></MsgType>
+    <Content><![CDATA[%s]]></Content>
+    </xml>"""%(toUser,fromUser,creatTime,msgType,content)
+
+    return HttpResponse(template,content_type="application/xml") 
 
 
 @csrf_exempt
@@ -68,22 +50,27 @@ def index(request):
 
         tmpstr = hashlib.sha1(tmpstr).hexdigest()
         
-        # 验证成功返回echostr
-        # if signature == tmpstr:
-        #     if echostr:
-        #         # 第一次验证会有echostr
-        #         return HttpResponse(response)
-        #     else:
-        #         return HttpResponse(responseMsg(request),content_type="application/xml")
-
         if signature == tmpstr and echostr:
+            # 验证成功返回echostr
             return HttpResponse(echostr)
-        if echostr:
+        if not echostr:
             return HttpResponse("")
 
+    # post接受到xml事件
     if request.method == "POST":
-        xmlstr = responseMsg(request)
-        return HttpResponse(xmlstr,content_type="application/xml")    
+
+        tree = request.body
+        if not tree:
+            root = ET.fromstring(tree)
+        else:
+            return HttpResponse('xml不能解析')
+
+        #事件
+        if root.find('MsgType').text.lower() == "event":
+            # 关注时间
+            if root.find('Event').text.lower() == 'subscribe':
+                return responseMsg(root)
+           
 
         
 
