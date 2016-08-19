@@ -3,11 +3,41 @@ from django.shortcuts import render,HttpResponse
 import hashlib
 import xml.etree.cElementTree as ET
 import time
+import urllib 
 from django.views.decorators.csrf import csrf_exempt
+import json
+import sys
+
+APPID = 'wxb90ad79b8a235838'
+APPS='c24c92374e8ffe68e3112138dc435ae5'
+
 
 # Create your views here.
 def home(request):
+
+    get(Token)
+
     return render(request,"test.html")
+
+# 获取token
+def getToken():
+
+
+    url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s" % (APPID,APPS)
+    jsondata = urllib.open(url)
+    try:
+        data = json.loads(jsondata)
+    except Exception as e:
+        # print(e)
+        return HttpResponse(e)
+
+        # sys.exit()
+    return HttpResponse(data)
+    # print(data)
+
+
+
+
 
 
 def xmlText(toUser,fromUser,creatTime,msgType,content):
