@@ -15,7 +15,7 @@ APPS='c24c92374e8ffe68e3112138dc435ae5'
 # Create your views here.
 def home(request):
 
-    getToken(Token)
+    getToken()
 
     return render(request,"test.html")
 
