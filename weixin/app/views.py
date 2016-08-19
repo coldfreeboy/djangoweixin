@@ -12,19 +12,11 @@ APPID = 'wxb90ad79b8a235838'
 APPS='c24c92374e8ffe68e3112138dc435ae5'
 
 
-# Create your views here.
-def home(request):
-
-    getToken()
-
-    return render(request,"test.html")
-
-# 获取token
 def getToken():
 
 
     url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s" % (APPID,APPS)
-    jsondata = urllib.open(url)
+    jsondata = urllib.urlopen(url)
     try:
         data = json.loads(jsondata)
     except Exception as e:
@@ -32,8 +24,19 @@ def getToken():
         return HttpResponse(e)
 
         # sys.exit()
+    # print(data)
     return HttpResponse(data)
     # print(data)
+
+# Create your views here.
+def home(request):
+
+    return getToken()
+
+    return render(request,"test.html")
+
+# 获取token
+
 
 
 
