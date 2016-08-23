@@ -3,43 +3,190 @@ from django.shortcuts import render,HttpResponse
 import hashlib
 import xml.etree.cElementTree as ET
 import time
-import urllib 
+import urllib,urllib2
 from django.views.decorators.csrf import csrf_exempt
 import json
 import sys
+import os
+import urllib2
 
-APPID = 'wxb90ad79b8a235838'
-APPS='c24c92374e8ffe68e3112138dc435ae5'
+APPID = 'wxd6d7a9d754b8b88c'
+APPS='7532acbce2d5efa153b2cf3a066ed443'
 
+
+TOKEN = {"time":"","token":""}
 
 def getToken():
+    # 判断文件是否存在
+    if TOKEN['token']:
+        if int(time.time())-int(TOKEN['time'])<7100:
+            return TOKEN['token']
 
 
+    # wx token获取
     url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s" % (APPID,APPS)
-    jsondata = urllib.urlopen(url)
+    response = urllib.urlopen(url)
+    jsondata = response.read()
+
     try:
         data = json.loads(jsondata)
-    except Exception as e:
-        # print(e)
-        return HttpResponse(e)
+    except:
+        sys.exit()
 
-        # sys.exit()
-    # print(data)
-    return HttpResponse(data)
-    # print(data)
+    if data["access_token"]:
+        TOKEN['time']=int(time.time())
+        TOKEN['token']=data["access_token"]
+        # print(data['access_token'])
+        return data['access_token']
+
+    return ""
+
+def getIp(token):
+    url = "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=%s" % token
+
+    response = urllib.urlopen(url)
+    jsondata = response.read()
+
+    try:
+        data = json.loads(jsondata)
+    except:
+        sys.exit()
+
+    if data['ip_list']:
+        return data['ip_list']
+
+    return ""
+
+def creat_btn():
+    data = {
+         "button":[
+         {  
+              "type":"click",
+              "name":u"主页",
+              "key":"2",
+          },
+          {
+               "name":u"菜单",
+               "sub_button":[
+               {    
+                   "type":"view",
+                   "name":u"百度",
+                   "url":"http://www.baidu.com",
+                },
+                {
+                   "type":"click",
+                   "name":u"随机",
+                   "key":"suiji",
+                },
+                {
+                   "type":"click",
+                   "name":u"赞一下我们",
+                   "key":"1",
+                }]
+           }]
+    }
+
+    data_b = {
+         "button":[
+         {  
+              "type":"click",
+              "name":"主页",
+              "key":"2",
+          },
+          {
+               "name":"菜单",
+               "sub_button":[
+               {    
+                   "type":"view",
+                   "name":"百度",
+                   "url":"http://www.baidu.com",
+                },
+                {
+                   "type":"click",
+                   "name":"随机",
+                   "key":"suiji",
+                },
+                {
+                   "type":"click",
+                   "name":"news",
+                   "key":"1",
+                }]
+           }]
+    }
+
+    # json_data = json.dumps(data,ensure_ascii=False).encode('utf-8')
+    json_data = json.dumps(data_b,ensure_ascii=False)
+
+    access_token = getToken()
+    # url =  "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=%s" % access_token
+    url="https://api.weixin.qq.com/cgi-bin/menu/create?"
+
+    get_data = urllib.urlencode({"access_token":access_token})
+
+    url ="%s%s" %(url,get_data)
+
+
+
+    print(url)
+    print(json_data)
+    
+    req = urllib2.Request(url)  
+
+    req.add_header('Content-Type', 'application/json')
+
+    req.add_header('encoding', 'utf-8')  
+
+    response = urllib2.urlopen(req, json_data)  
+
+    result = response.read()
+
+    return result
+
+
+
+
+       # 请求创建
+    # response = urllib.urlopen(urls,json_data)
+    # print(response)
+    # response_data = json.loads(response.read())
+    # status = response_data.get("errcode")
+
+    # if not status:
+    #     print("创建成功")
+    # else:
+    #     print(response_data)
+
+    # return response_data
+
+
+
+    
 
 # Create your views here.
 def home(request):
 
-    return getToken()
+    # token = getToken()
+    # print(token)
+
+    # if token:
+    #     ips = getIp(token)
+
+    #     if ips:
+    #         print(ips)
+    #         print(type(ips))
+    #         return HttpResponse(ips)
+    #     else:
+    #         return HttpResponse("error")    
+
+    data = creat_btn()
+
+    return HttpResponse(data)
+        
+
 
     return render(request,"test.html")
 
 # 获取token
-
-
-
-
 
 
 
@@ -95,7 +242,7 @@ def xmlNews(toUser,fromUser,creatTime):
 
 
 
-# 关注响应时间
+# 关注响应
 def responseMsg(root):
 
     toUser = root.find("FromUserName").text
@@ -142,6 +289,39 @@ def responseText(root):
 
 
 
+# 菜单点击事件
+def eventClick(root):
+    key = root.find("EventKey").text
+    if not key:
+        return 0
+    else:
+        if key == "1":
+
+            toUser = root.find("FromUserName").text
+            fromUser = root.find('ToUserName').text
+            creatTime = str(int(time.time()))
+            msgType = 'text'
+            content = "key is 1 and menu is news"
+
+            return xmlText(toUser,fromUser,creatTime,msgType,content)
+
+        if key =="2":
+
+            toUser = root.find("FromUserName").text
+            fromUser = root.find('ToUserName').text
+            creatTime = str(int(time.time()))
+            msgType = 'text'
+            content = "key is 1 and menu is 主页"
+
+            return xmlText(toUser,fromUser,creatTime,msgType,content)
+
+
+
+
+
+
+
+
 @csrf_exempt
 def index(request):
     # 与微信验证
@@ -179,7 +359,8 @@ def index(request):
             # 关注事件
             if root.find('Event').text.lower() == 'subscribe':
                 return responseMsg(root)
-           
+            if root.find('Event').text.lower() == 'click':
+                return eventClick(root)
 
         # 文本
         if root.find('MsgType').text.lower() == "text":
