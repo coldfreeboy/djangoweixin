@@ -157,7 +157,10 @@ def home(request):
 #     </xml>"""%(toUser,fromUser,creatTime,msgType,content)
 #     return HttpResponse(template,content_type="application/xml")
 
-def xmlNews(toUser,fromUser,creatTime):
+def xmlNews(root):
+    toUser = root.find("FromUserName").text
+    fromUser = root.find('ToUserName').text
+    creatTime = str(int(time.time()))
 
     news_list = []
     obj_news={
