@@ -264,10 +264,10 @@ def eventClick(root):
     else:
         if key == "1":
             content = "key is 1 and menu is news"
-            return WX.responseText(root,content)
+            return Wx.responseText(root,content)
         if key =="2":
             content = "key is 2 and menu is 主页"
-            return WX.responseText(root,content)
+            return Wx.responseText(root,content)
 
 @csrf_exempt
 def index(request):
