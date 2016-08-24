@@ -238,7 +238,7 @@ def responseText(root):
         news_list.append(one)
         news_list.append(one)
 
-        return xmlNews(root)
+        return Wx.xmlNews(root,news_list)
     else:
         content="""
         说明页

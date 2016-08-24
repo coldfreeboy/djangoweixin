@@ -116,7 +116,7 @@ class Wx():
         creatTime = str(int(time.time()))
         msgType = 'text'
         content = content
-        return cls.xmlText(toUser,fromUser,creatTime,msgType,content)
+        return cls.xmlText(toUser,fromUser,creatTime,content,msgType)
 
     # 图片文本
     @classmethod
