@@ -120,11 +120,11 @@ class Wx():
 
     # 图片文本
     @classmethod
-    def creatNew(cls,title,description,picurl,url):
+    def createNew(cls,title,description,picurl,url):
         new={
         "title":title,
         'description':description,
-        'picurl':picturl,
+        'picurl':picurl,
         'url':url,
         }
 
@@ -152,6 +152,7 @@ class Wx():
             templates = "%s%s" % (templates,template)
 
         templates = "%s</Articles>" % templates
+
         template_head ="""<xml>
         <ToUserName><![CDATA[%s]]></ToUserName>
         <FromUserName><![CDATA[%s]]></FromUserName>

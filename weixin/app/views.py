@@ -230,7 +230,7 @@ def responseText(root):
     elif context == "2":
         news_list =[]
 
-        one =  Wx.creatNew("百度",'百度链接',
+        one =  Wx.createNew("百度",'百度链接',
             'https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=2306836341,4091540152&fm=58&s=39C718720E8EBE011B398BAC0300F024','http://www.baidu.com')
         news_list.append(one)
         news_list.append(one)
