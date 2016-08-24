@@ -269,7 +269,8 @@ def eventClick(root):
 @csrf_exempt
 def index(request):
     # 微信验证
-    return Wx.check(request)
+    if request.method == "GET":
+        return Wx.check(request)
 
     # post接受到xml事件
     if request.method == "POST":
