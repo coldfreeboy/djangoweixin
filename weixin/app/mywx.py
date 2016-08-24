@@ -4,6 +4,7 @@ from django.shortcuts import render,HttpResponse
 import json
 import urllib
 import time
+import hashlib
 # appid appsecrety
 
 class Wx():
@@ -82,7 +83,7 @@ class Wx():
 
         return ""
 
-        
+
 
     # 文本回复
     # @parameter
@@ -116,6 +117,7 @@ class Wx():
         msgType = 'text'
         content = content
         return cls.xmlText(toUser,fromUser,creatTime,msgType,content)
+
 
 
 
