@@ -9,7 +9,7 @@ import json
 import sys
 import os
 import urllib2
-import mywx
+from mywx import Wx
 
 APPID = 'wxd6d7a9d754b8b88c'
 APPS='7532acbce2d5efa153b2cf3a066ed443'
@@ -266,24 +266,25 @@ def eventClick(root):
 def index(request):
     # 与微信验证
     # 将timestamp，noce，token按字典排序
-    if request.method == "GET":
-        timestamp = request.GET.get('timestamp')
-        nonce     = request.GET.get('nonce')
-        taken     = "dangweiwu"
-        signature = request.GET.get('signature')
-        echostr   = request.GET.get("echostr","") 
+    # if request.method == "GET":
+    #     timestamp = request.GET.get('timestamp')
+    #     nonce     = request.GET.get('nonce')
+    #     taken     = "dangweiwu"
+    #     signature = request.GET.get('signature')
+    #     echostr   = request.GET.get("echostr","") 
         
-        # 排序后进行sha1加密
-        l = sorted([timestamp,nonce,taken])
-        tmpstr = "".join(l)
+    #     # 排序后进行sha1加密
+    #     l = sorted([timestamp,nonce,taken])
+    #     tmpstr = "".join(l)
 
-        tmpstr = hashlib.sha1(tmpstr).hexdigest()
+    #     tmpstr = hashlib.sha1(tmpstr).hexdigest()
         
-        if signature == tmpstr and echostr:
-            # 验证成功返回echostr
-            return HttpResponse(echostr)
-        if not echostr:
-            return HttpResponse("")
+    #     if signature == tmpstr and echostr:
+    #         # 验证成功返回echostr
+    #         return HttpResponse(echostr)
+    #     if not echostr:
+    #         return HttpResponse("")
+    return Wx.check(request)
 
     # post接受到xml事件
     if request.method == "POST":
