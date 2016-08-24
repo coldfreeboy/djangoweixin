@@ -118,24 +118,48 @@ class Wx():
         content = content
         return cls.xmlText(toUser,fromUser,creatTime,msgType,content)
 
+    # 图片文本
+    @classmethod
+    def creatNew(cls,title,description,picurl,url):
+        new={
+        "title":title,
+        'description':description,
+        'picurl':picturl,
+        'url':url,
+        }
+
+        return new
 
 
 
+    @classmethod
+    def xmlNews(cls,root,news_list):
 
+        # 获取请求xml信息
+        toUser = root.find("FromUserName").text
+        fromUser = root.find('ToUserName').text
+        creatTime = str(int(time.time()))
 
+        # xml数据组装
+        templates="<Articles>"
+        for i in news_list:
 
+            template ="""<item><Title><![CDATA[%s]]></Title> 
+            <Description><![CDATA[%s]]></Description>
+            <PicUrl><![CDATA[%s]]></PicUrl>
+            <Url><![CDATA[%s]]></Url></item>""" % (i['title'],i['description'],i['picurl'],i['url'])
 
+            templates = "%s%s" % (templates,template)
 
+        templates = "%s</Articles>" % templates
+        template_head ="""<xml>
+        <ToUserName><![CDATA[%s]]></ToUserName>
+        <FromUserName><![CDATA[%s]]></FromUserName>
+        <CreateTime>%s</CreateTime>
+        <MsgType><![CDATA[news]]></MsgType>
+        <ArticleCount>%s</ArticleCount>""" % (toUser,fromUser,creatTime,len(news_list))
 
+        template_body ="%s%s</xml>"%(template_head,templates)
 
-
-
-
-
-
-
-
-
-
-
+        return HttpResponse(template_body,content_type="application/xml")
 

@@ -122,6 +122,7 @@ def creat_btn():
 
 # Create your views here.
 def home(request):
+    return HttpResponse(Wx.test())
 
     # token = getToken()
     # print(token)
@@ -146,15 +147,15 @@ def home(request):
 
 
 
-def xmlText(toUser,fromUser,creatTime,msgType,content):
-    template = """<xml>
-    <ToUserName><![CDATA[%s]]></ToUserName>
-    <FromUserName><![CDATA[%s]]></FromUserName>
-    <CreateTime>%s</CreateTime>
-    <MsgType><![CDATA[%s]]></MsgType>
-    <Content><![CDATA[%s]]></Content>
-    </xml>"""%(toUser,fromUser,creatTime,msgType,content)
-    return HttpResponse(template,content_type="application/xml")
+# def xmlText(toUser,fromUser,creatTime,msgType,content):
+#     template = """<xml>
+#     <ToUserName><![CDATA[%s]]></ToUserName>
+#     <FromUserName><![CDATA[%s]]></FromUserName>
+#     <CreateTime>%s</CreateTime>
+#     <MsgType><![CDATA[%s]]></MsgType>
+#     <Content><![CDATA[%s]]></Content>
+#     </xml>"""%(toUser,fromUser,creatTime,msgType,content)
+#     return HttpResponse(template,content_type="application/xml")
 
 def xmlNews(toUser,fromUser,creatTime):
 
@@ -187,36 +188,36 @@ def xmlNews(toUser,fromUser,creatTime):
 
     templates = "%s</Articles>" % templates
     template_head ="""<xml>
-<ToUserName><![CDATA[%s]]></ToUserName>
-<FromUserName><![CDATA[%s]]></FromUserName>
-<CreateTime>%s</CreateTime>
-<MsgType><![CDATA[news]]></MsgType>
-<ArticleCount>%s</ArticleCount>""" % (toUser,fromUser,creatTime,len(news_list))
+    <ToUserName><![CDATA[%s]]></ToUserName>
+    <FromUserName><![CDATA[%s]]></FromUserName>
+    <CreateTime>%s</CreateTime>
+    <MsgType><![CDATA[news]]></MsgType>
+    <ArticleCount>%s</ArticleCount>""" % (toUser,fromUser,creatTime,len(news_list))
     template_body ="%s%s</xml>"%(template_head,templates)
 
     return HttpResponse(template_body,content_type="application/xml")
 
 
 
-# 关注响应
-def responseMsg(root):
+# # 关注响应
+# def responseMsg(root):
 
-    toUser = root.find("FromUserName").text
-    fromUser = root.find('ToUserName').text
-    creatTime = str(int(time.time()))
-    msgType = 'text'
-    content = "欢迎订阅"
+#     toUser = root.find("FromUserName").text
+#     fromUser = root.find('ToUserName').text
+#     creatTime = str(int(time.time()))
+#     msgType = 'text'
+#     content = "欢迎订阅"
 
-    return xmlText(toUser,fromUser,creatTime,msgType,content)
+#     return xmlText(toUser,fromUser,creatTime,msgType,content)
 
 
 # 文本回复
 def responseText(root):
 
-    toUser = root.find("FromUserName").text
-    fromUser = root.find('ToUserName').text
-    creatTime = str(int(time.time()))
-    msgType = 'text'
+    # toUser = root.find("FromUserName").text
+    # fromUser = root.find('ToUserName').text
+    # creatTime = str(int(time.time()))
+    # msgType = 'text'
 
     context = root.find('Content').text
 
@@ -227,7 +228,14 @@ def responseText(root):
         content = "<a href='https://www.taobao.com/'>淘宝</a> "
         
     elif context == "2":
-        return xmlNews(toUser,fromUser,creatTime)
+        news_list =[]
+
+        one =  Wx.creatNew("百度",'百度链接',
+            'https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=2306836341,4091540152&fm=58&s=39C718720E8EBE011B398BAC0300F024','http://www.baidu.com')
+        news_list.append(one)
+        news_list.append(one)
+
+        return Wx.xmlNews(root,news_list)
     else:
         content="""
         说明页
@@ -241,7 +249,7 @@ def responseText(root):
         其他输入返回本页
 
         """
-    return xmlText(toUser,fromUser,creatTime,msgType,content)
+    return Wx.responseText(root,content)
 
 
 
@@ -252,38 +260,15 @@ def eventClick(root):
         return 0
     else:
         if key == "1":
-
             content = "key is 1 and menu is news"
-
-            return responseText(root,content)
-
+            return WX.responseText(root,content)
         if key =="2":
             content = "key is 2 and menu is 主页"
-
-            return responseText(root,content)
+            return WX.responseText(root,content)
 
 @csrf_exempt
 def index(request):
-    # 与微信验证
-    # 将timestamp，noce，token按字典排序
-    # if request.method == "GET":
-    #     timestamp = request.GET.get('timestamp')
-    #     nonce     = request.GET.get('nonce')
-    #     taken     = "dangweiwu"
-    #     signature = request.GET.get('signature')
-    #     echostr   = request.GET.get("echostr","") 
-        
-    #     # 排序后进行sha1加密
-    #     l = sorted([timestamp,nonce,taken])
-    #     tmpstr = "".join(l)
-
-    #     tmpstr = hashlib.sha1(tmpstr).hexdigest()
-        
-    #     if signature == tmpstr and echostr:
-    #         # 验证成功返回echostr
-    #         return HttpResponse(echostr)
-    #     if not echostr:
-    #         return HttpResponse("")
+    # 微信验证
     return Wx.check(request)
 
     # post接受到xml事件
@@ -299,7 +284,7 @@ def index(request):
         if root.find('MsgType').text.lower() == "event":
             # 关注事件
             if root.find('Event').text.lower() == 'subscribe':
-                return responseMsg(root)
+                return Wx.responseText(root,"欢迎订阅")
             if root.find('Event').text.lower() == 'click':
                 return eventClick(root)
 
