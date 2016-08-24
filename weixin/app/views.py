@@ -240,18 +240,17 @@ def responseText(root):
 
         return Wx.xmlNews(root,news_list)
     else:
-        content="""
-        说明页
-        ----------
-        0:介绍测试 
-        1:淘宝链接测试
-        2:图片文章测试
+        content="""说明页
+----------
+0:介绍测试 
+1:淘宝链接测试
+2:图片文章测试
 
-        第0项输入介绍
-        其余项输入对应数字
-        其他输入返回本页
+第0项输入介绍
+其余项输入对应数字
+其他输入返回本页
 
-        """
+"""
     return Wx.responseText(root,content)
 
 
