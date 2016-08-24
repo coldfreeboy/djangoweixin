@@ -1,6 +1,6 @@
 #!coding:utf-8
 #微信接口
-
+from django.shortcuts import render,HttpResponse
 import json
 import urllib
 import time
@@ -81,6 +81,8 @@ class Wx():
             return data['ip_list']
 
         return ""
+
+        
 
     # 文本回复
     # @parameter
