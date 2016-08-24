@@ -18,23 +18,23 @@ class Wx():
     def check(cls,request):
         # 与微信验证
         # 将timestamp，noce，token按字典排序
-        if request.method == "GET":
-            timestamp = request.GET.get('timestamp')
-            nonce     = request.GET.get('nonce')
-            taken     = "dangweiwu"
-            signature = request.GET.get('signature')
-            echostr   = request.GET.get("echostr","") 
-            
-            # 排序后进行sha1加密
-            l = sorted([timestamp,nonce,taken])
-            tmpstr = "".join(l)
+        
+        timestamp = request.GET.get('timestamp')
+        nonce     = request.GET.get('nonce')
+        taken     = "dangweiwu"
+        signature = request.GET.get('signature')
+        echostr   = request.GET.get("echostr","") 
+        
+        # 排序后进行sha1加密
+        l = sorted([timestamp,nonce,taken])
+        tmpstr = "".join(l)
 
-            tmpstr = hashlib.sha1(tmpstr).hexdigest()
-            
-            if signature == tmpstr and echostr:
-                # 验证成功返回echostr
-                return HttpResponse(echostr)
-        return "非get"
+        tmpstr = hashlib.sha1(tmpstr).hexdigest()
+        
+        if signature == tmpstr and echostr:
+            # 验证成功返回echostr
+            return HttpResponse(echostr)
+        
 
     # 获取token
     @classmethod
