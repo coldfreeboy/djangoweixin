@@ -9,6 +9,7 @@ import json
 import sys
 import os
 import urllib2
+import mywx
 
 APPID = 'wxd6d7a9d754b8b88c'
 APPS='7532acbce2d5efa153b2cf3a066ed443'
@@ -58,33 +59,7 @@ def getIp(token):
     return ""
 
 def creat_btn():
-    data = {
-         "button":[
-         {  
-              "type":"click",
-              "name":u"主页",
-              "key":"2",
-          },
-          {
-               "name":u"菜单",
-               "sub_button":[
-               {    
-                   "type":"view",
-                   "name":u"百度",
-                   "url":"http://www.baidu.com",
-                },
-                {
-                   "type":"click",
-                   "name":u"随机",
-                   "key":"suiji",
-                },
-                {
-                   "type":"click",
-                   "name":u"赞一下我们",
-                   "key":"1",
-                }]
-           }]
-    }
+
 
     data_b = {
          "button":[
@@ -114,7 +89,7 @@ def creat_btn():
            }]
     }
 
-    # json_data = json.dumps(data,ensure_ascii=False).encode('utf-8')
+
     json_data = json.dumps(data_b,ensure_ascii=False)
 
     access_token = getToken()
@@ -143,23 +118,6 @@ def creat_btn():
     return result
 
 
-
-
-       # 请求创建
-    # response = urllib.urlopen(urls,json_data)
-    # print(response)
-    # response_data = json.loads(response.read())
-    # status = response_data.get("errcode")
-
-    # if not status:
-    #     print("创建成功")
-    # else:
-    #     print(response_data)
-
-    # return response_data
-
-
-
     
 
 # Create your views here.
@@ -181,8 +139,6 @@ def home(request):
     data = creat_btn()
 
     return HttpResponse(data)
-        
-
 
     return render(request,"test.html")
 
@@ -297,30 +253,14 @@ def eventClick(root):
     else:
         if key == "1":
 
-            toUser = root.find("FromUserName").text
-            fromUser = root.find('ToUserName').text
-            creatTime = str(int(time.time()))
-            msgType = 'text'
             content = "key is 1 and menu is news"
 
-            return xmlText(toUser,fromUser,creatTime,msgType,content)
+            return responseText(root,content)
 
         if key =="2":
+            content = "key is 2 and menu is 主页"
 
-            toUser = root.find("FromUserName").text
-            fromUser = root.find('ToUserName').text
-            creatTime = str(int(time.time()))
-            msgType = 'text'
-            content = "key is 1 and menu is 主页"
-
-            return xmlText(toUser,fromUser,creatTime,msgType,content)
-
-
-
-
-
-
-
+            return responseText(root,content)
 
 @csrf_exempt
 def index(request):
