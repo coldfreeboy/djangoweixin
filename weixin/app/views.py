@@ -11,52 +11,9 @@ import os
 import urllib2
 from mywx import Wx
 
-APPID = 'wxd6d7a9d754b8b88c'
-APPS='7532acbce2d5efa153b2cf3a066ed443'
 
-
-TOKEN = {"time":"","token":""}
-
-def getToken():
-    # 判断文件是否存在
-    if TOKEN['token']:
-        if int(time.time())-int(TOKEN['time'])<7100:
-            return TOKEN['token']
-
-
-    # wx token获取
-    url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s" % (APPID,APPS)
-    response = urllib.urlopen(url)
-    jsondata = response.read()
-
-    try:
-        data = json.loads(jsondata)
-    except:
-        sys.exit()
-
-    if data["access_token"]:
-        TOKEN['time']=int(time.time())
-        TOKEN['token']=data["access_token"]
-        # print(data['access_token'])
-        return data['access_token']
-
-    return ""
-
-def getIp(token):
-    url = "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=%s" % token
-
-    response = urllib.urlopen(url)
-    jsondata = response.read()
-
-    try:
-        data = json.loads(jsondata)
-    except:
-        sys.exit()
-
-    if data['ip_list']:
-        return data['ip_list']
-
-    return ""
+def post_file():
+  pass
 
 def creat_btn():
 
@@ -93,18 +50,12 @@ def creat_btn():
     json_data = json.dumps(data_b,ensure_ascii=False)
 
     access_token = getToken()
-    # url =  "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=%s" % access_token
     url="https://api.weixin.qq.com/cgi-bin/menu/create?"
 
     get_data = urllib.urlencode({"access_token":access_token})
 
     url ="%s%s" %(url,get_data)
 
-
-
-    print(url)
-    print(json_data)
-    
     req = urllib2.Request(url)  
 
     req.add_header('Content-Type', 'application/json')
@@ -117,15 +68,44 @@ def creat_btn():
 
     return result
 
-
+btn ={
+         "button":[
+         {  
+              "type":"click",
+              "name":"主页",
+              "key":"1",
+          },
+          {
+               "name":"菜单",
+               "sub_button":[
+               {    
+                   "type":"view",
+                   "name":"百度",
+                   "url":"http://www.baidu.com",
+                },
+                {
+                   "type":"click",
+                   "name":"随机",
+                   "key":"2",
+                },
+                {
+                   "type":"click",
+                   "name":"news",
+                   "key":"2",
+                }]
+           }]
+    }
     
 
 # Create your views here.
 def home(request):
-    return HttpResponse(Wx.test())
+    # return HttpResponse(Wx.test())
 
-    # token = getToken()
-    # print(token)
+    token = Wx.getToken()
+    print(token)
+    token = Wx.getToken()
+    print(token)
+    return HttpResponse(token)
 
     # if token:
     #     ips = getIp(token)
@@ -137,81 +117,24 @@ def home(request):
     #     else:
     #         return HttpResponse("error")    
 
-    data = creat_btn()
+    # 创建菜单
+    # data = Wx.createBtn(btn)
+    # 上传图片
 
-    return HttpResponse(data)
+    # res = Wx.curl_file("xin.png",'image','xim.png',"image/png")
+    # if res['error']:
+    #     return HttpResponse(res['msg'])
+    # else:
+    #     msg = res['msg']
 
-    return render(request,"test.html")
-
-# 获取token
-
-
-
-# def xmlText(toUser,fromUser,creatTime,msgType,content):
-#     template = """<xml>
-#     <ToUserName><![CDATA[%s]]></ToUserName>
-#     <FromUserName><![CDATA[%s]]></FromUserName>
-#     <CreateTime>%s</CreateTime>
-#     <MsgType><![CDATA[%s]]></MsgType>
-#     <Content><![CDATA[%s]]></Content>
-#     </xml>"""%(toUser,fromUser,creatTime,msgType,content)
-#     return HttpResponse(template,content_type="application/xml")
-
-def xmlNews(root):
-    toUser = root.find("FromUserName").text
-    fromUser = root.find('ToUserName').text
-    creatTime = str(int(time.time()))
-
-    news_list = []
-    obj_news={
-    "title":"百度",
-    'description':"百度链接",
-    'picurl':"https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/logo_white_fe6da1ec.png",
-    'url':'http://www.baidu.com'
-    }
-    obj_news2={
-    "title":"百度",
-    'description':"百度链接",
-    'picurl':"https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/logo_white_fe6da1ec.png",
-    'url':'http://www.baidu.com'
-    }
-
-    news_list.append(obj_news)
-    news_list.append(obj_news2)
-    templates="<Articles>"
- 
-    for i in news_list:
-
-        template ="""<item><Title><![CDATA[%s]]></Title> 
-        <Description><![CDATA[%s]]></Description>
-        <PicUrl><![CDATA[%s]]></PicUrl>
-        <Url><![CDATA[%s]]></Url></item>""" % (i['title'],i['description'],i['picurl'],i['url'])
-
-        templates = "%s%s" % (templates,template)
-
-    templates = "%s</Articles>" % templates
-    template_head ="""<xml>
-    <ToUserName><![CDATA[%s]]></ToUserName>
-    <FromUserName><![CDATA[%s]]></FromUserName>
-    <CreateTime>%s</CreateTime>
-    <MsgType><![CDATA[news]]></MsgType>
-    <ArticleCount>%s</ArticleCount>""" % (toUser,fromUser,creatTime,len(news_list))
-    template_body ="%s%s</xml>"%(template_head,templates)
-
-    return HttpResponse(template_body,content_type="application/xml")
+    #     with open('imageMsg.txt','wb') as f:
+    #         f.write(msg)
+    #     return HttpResponse(msg)
 
 
+    # return HttpResponse(data)
 
-# # 关注响应
-# def responseMsg(root):
-
-#     toUser = root.find("FromUserName").text
-#     fromUser = root.find('ToUserName').text
-#     creatTime = str(int(time.time()))
-#     msgType = 'text'
-#     content = "欢迎订阅"
-
-#     return xmlText(toUser,fromUser,creatTime,msgType,content)
+    # return render(request,"test.html")
 
 
 # 文本回复

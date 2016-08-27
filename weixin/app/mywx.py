@@ -1,16 +1,19 @@
 #!coding:utf-8
 #微信接口
 from django.shortcuts import render,HttpResponse
-import json
-import urllib
-import time
-import hashlib
-# appid appsecrety
+import json,time,os,hashlib
+import urllib,urllib2
+import requests
 
+
+print("this is test")
 class Wx():
     _APPID = 'wxd6d7a9d754b8b88c'
     _APPS='7532acbce2d5efa153b2cf3a066ed443'
     _TOKEN = {"time":"","token":""}
+
+    def __init__(self):
+        print "class init"
 
 
     # 第一次验证
@@ -21,6 +24,7 @@ class Wx():
         
         timestamp = request.GET.get('timestamp')
         nonce     = request.GET.get('nonce')
+        # 根据自己情况设置
         taken     = "dangweiwu"
         signature = request.GET.get('signature')
         echostr   = request.GET.get("echostr","") 
@@ -41,7 +45,7 @@ class Wx():
     def getToken(cls):
         # 判断文件是否存在
         if cls._TOKEN['token']:
-            if int(time.time())-int(TOKEN['time'])<7000:
+            if int(time.time())-int(cls._TOKEN['time'])<7000:
                 return cls._TOKEN['token']
 
 
@@ -56,8 +60,8 @@ class Wx():
             sys.exit()
 
         if data["access_token"]:
-            TOKEN['time']=int(time.time())
-            TOKEN['token']=data["access_token"]
+            cls._TOKEN['time']=int(time.time())
+            cls._TOKEN['token']=data["access_token"]
             # print(data['access_token'])
             return data['access_token']
 
@@ -85,7 +89,7 @@ class Wx():
 
 
 
-    # 文本回复
+    # 基本文本回复
     # @parameter
     # toUser:接受者
     # fromUser：发送者
@@ -105,7 +109,7 @@ class Wx():
         </xml>"""%(toUser,fromUser,creatTime,msgType,content)
         return HttpResponse(template,content_type="application/xml")
 
-    # 文本回复简化版
+    # 简化版文本回复
     # 参数：
     # root：微信发送请求的xml数据
     # content：发送内容utf-8格式
@@ -119,6 +123,7 @@ class Wx():
         return cls.xmlText(toUser,fromUser,creatTime,content,msgType)
 
     # 图片文本
+    # 创建item内容
     @classmethod
     def createNew(cls,title,description,picurl,url):
         new={
@@ -131,7 +136,7 @@ class Wx():
         return new
 
 
-
+    # 创建图片文本响应
     @classmethod
     def xmlNews(cls,root,news_list):
 
@@ -163,4 +168,63 @@ class Wx():
         template_body ="%s%s</xml>"%(template_head,templates)
 
         return HttpResponse(template_body,content_type="application/xml")
+
+    # 创建按钮
+    @classmethod
+    def createBtn(cls,btn_conf):
+        if type(btn_conf) != dict:
+            return "请输入字典类型参数"
+
+        json_data = json.dumps(btn_conf,ensure_ascii=False)
+
+        access_token = cls.getToken()
+        url="https://api.weixin.qq.com/cgi-bin/menu/create?"
+
+        get_data = urllib.urlencode({"access_token":access_token})
+
+        url ="%s%s" %(url,get_data)
+
+        req = urllib2.Request(url)  
+
+        req.add_header('Content-Type', 'application/json')
+
+        req.add_header('encoding', 'utf-8')  
+
+        response = urllib2.urlopen(req, json_data)  
+
+        result = response.read()
+
+        return result
+
+    # 上传图片
+    @classmethod
+    def curl_file(cls,img_path,file_type,file_name,content_type):
+        # Content-Disposition: form-data; name="file"; filename="sygj.png"
+        # Content-Type: image/png
+        file_types=['image','thumb','video','voice']
+        if file_type not in file_types:
+            return {'error':1,'msg':"文件类型不对"}
+
+        if not os.path.exists(img_path):
+            return {'error':1,'msg':"文件不存在"}
+
+        image =open(img_path,'rb')
+        url = 'https://api.weixin.qq.com/cgi-bin/media/upload?'
+        get_data = urllib.urlencode({"access_token":cls.getToken(),"type":file_type})
+        url = "%s%s" % (url,get_data)
+
+        file = {
+        file_type :(file_name,image,content_type)
+        }
+
+        response = requests.post(url,files=file)
+
+        image.close()
+        return {'error':0,'msg':response.content}
+
+
+
+
+
+
 
