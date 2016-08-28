@@ -6,11 +6,26 @@ import urllib,urllib2
 import requests
 
 
+def _F(name,data=""):
+    file = os.path.exists(name)
+    if not file and not data:
+        return ""
+
+    if data:
+        with open(name,"wb") as f:
+            f.write(json.dumps(data))
+
+    if not data:
+        with open(name,"rb") as f:
+            d  = f.read()
+            return json.loads(d)
+
+
 print("this is test")
 class Wx():
     _APPID = 'wxd6d7a9d754b8b88c'
     _APPS='7532acbce2d5efa153b2cf3a066ed443'
-    _TOKEN = {"time":"","token":""}
+    
 
     def __init__(self):
         print "class init"
@@ -44,9 +59,10 @@ class Wx():
     @classmethod
     def getToken(cls):
         # 判断文件是否存在
-        if cls._TOKEN['token']:
-            if int(time.time())-int(cls._TOKEN['time'])<7000:
-                return cls._TOKEN['token']
+        d = _F("mytoken.cach")
+        if d:
+            if time.time()-int(d['time'])<7000:
+                return d['token']
 
 
         # wx token获取
@@ -60,9 +76,12 @@ class Wx():
             sys.exit()
 
         if data["access_token"]:
-            cls._TOKEN['time']=int(time.time())
-            cls._TOKEN['token']=data["access_token"]
+ 
+            jd={}
+            jd['time']=int(time.time())
+            jd['token']=data["access_token"]
             # print(data['access_token'])
+            _F('mytoken.cach',jd)
             return data['access_token']
 
         return ""
