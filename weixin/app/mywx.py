@@ -6,6 +6,7 @@ import urllib,urllib2
 import requests
 
 
+# token写入文件或者读取
 def _F(name,data=""):
     file = os.path.exists(name)
     if not file and not data:
@@ -21,7 +22,7 @@ def _F(name,data=""):
             return json.loads(d)
 
 
-print("this is test")
+# 微信类模块
 class Wx():
     _APPID = 'wxd6d7a9d754b8b88c'
     _APPS='7532acbce2d5efa153b2cf3a066ed443'
@@ -87,7 +88,7 @@ class Wx():
         return ""
 
 
-
+        # 获取ip
     @classmethod
     def getIp(cls):
         token = cls.getToken()
